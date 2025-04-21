@@ -1,10 +1,12 @@
 import { Text, View, TextInput, ScrollView, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import { useRouter } from 'expo-router';
 
 
 export default function Index() {
   const [selectedCategory, setSelectedCategory] = useState('');
+  const router = useRouter();
   
   return (
     <ScrollView className="flex-1 bg-white">
@@ -131,7 +133,10 @@ export default function Index() {
         <View className="px-4 mt-6">
           <Text className="text-xl font-bold mb-4">Sport halls near you</Text>
           
-          <TouchableOpacity className="flex-row items-center bg-white rounded-xl p-3 mb-4 shadow-sm">
+          <TouchableOpacity 
+            className="flex-row items-center bg-white rounded-xl p-3 mb-4 shadow-sm"
+            onPress={() => router.push('/1')}
+          >
             <Image 
               source={require('../assets/images/sport-hall-1.png')}
               className="w-20 h-20 rounded-lg"
@@ -153,7 +158,10 @@ export default function Index() {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity className="flex-row items-center bg-white rounded-xl p-3 mb-4 shadow-sm">
+          <TouchableOpacity 
+            className="flex-row items-center bg-white rounded-xl p-3 mb-4 shadow-sm"
+            onPress={() => router.push('/2')}
+          >
             <Image 
               source={require('../assets/images/sport-hall-2.png')}
               className="w-20 h-20 rounded-lg"
