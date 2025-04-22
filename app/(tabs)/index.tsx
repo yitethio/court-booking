@@ -1,13 +1,45 @@
 import { Text, View, TextInput, ScrollView, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import React from 'react';
 
+import { useEffect, useState } from 'react';
+
+// Add this interface for type safety
+interface Court {
+  name: string;
+  facility: string[];
+  price: string;
+  image: string;
+  discount?: string;
+  category: string;
+  ratings: number;
+  id: string;
+}
 
 export default function Index() {
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [courts, setCourts] = useState<Court[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
-  
+
+  useEffect(() => {
+    fetchCourts();
+  }, []);
+
+  const fetchCourts = async () => {
+    try {
+      // Replace with your actual API endpoint
+      const response = await fetch('https://64fa30874098a7f2fc15737d.mockapi.io/court');
+      const data = await response.json();
+      setCourts(data);
+    } catch (error) {
+      console.error('Error fetching courts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <ScrollView className="flex-1 bg-white">
       <View>
@@ -47,7 +79,7 @@ export default function Index() {
           <TouchableOpacity className="mr-4">
             <View className="w-64 h-32 rounded-xl overflow-hidden relative">
               <Image 
-                source={require('../assets/images/badminton-court.png')}
+                source={require('../../assets/images/badminton-court.png')}
                 className="absolute w-full h-full"
                 resizeMode="cover"
               />
@@ -69,7 +101,7 @@ export default function Index() {
           <TouchableOpacity className="mr-4">
             <View className="w-64 h-32 rounded-xl overflow-hidden relative">
               <Image 
-                source={require('../assets/images/tennis-court.png')}
+                source={require('../../assets/images/tennis-court.png')}
                 className="absolute w-full h-full"
                 resizeMode="cover"
               />
@@ -133,52 +165,46 @@ export default function Index() {
         <View className="px-4 mt-6">
           <Text className="text-xl font-bold mb-4">Sport halls near you</Text>
           
-          <TouchableOpacity 
-            className="flex-row items-center bg-white rounded-xl p-3 mb-4 shadow-sm"
-            onPress={() => router.push('/1')}
-          >
-            <Image 
-              source={require('../assets/images/sport-hall-1.png')}
-              className="w-20 h-20 rounded-lg"
-              resizeMode="cover"
-            />
-            <View className="flex-1 ml-3">
-              <View className="flex-row justify-between items-center">
-                <Text className="font-bold text-lg">Harapan Utama</Text>
-                <View className="flex-row items-center">
-                  <Ionicons name="star" size={16} color="#FFD700" />
-                  <Text className="ml-1">4.7</Text>
+          {loading ? (
+            <Text>Loading...</Text>
+          ) : (
+            courts.map((court) => (
+              <TouchableOpacity 
+                key={court.id}
+                className="flex-row items-center bg-white rounded-xl p-3 mb-4 shadow-sm"
+                onPress={() => router.push({
+                  pathname: `/[id]` as const,
+                  params: { 
+                    ...court, // Pass the entire court object
+                    facility: JSON.stringify(court.facility),
+                    rating: court.ratings // Ensure rating matches the detail page expectation
+                  }
+                })}
+              >
+                <Image 
+                  source={{ uri: court.image }}
+                  className="w-20 h-20 rounded-lg"
+                  resizeMode="cover"
+                />
+                <View className="flex-1 ml-3">
+                  <View className="flex-row justify-between items-center">
+                    <Text className="font-bold text-lg">{court.name}</Text>
+                    <View className="flex-row items-center">
+                      <Ionicons name="star" size={16} color="#FFD700" />
+                      <Text className="ml-1">{court.ratings}</Text>
+                    </View>
+                  </View>
+                  <View className="flex-row items-center mt-1">
+                    {court.discount && (
+                      <Text className="text-red-500 font-bold">{court.discount}</Text>
+                    )}
+                    <Text className="ml-2">{court.price}</Text>
+                  </View>
+                  <Text className="text-gray-500 mt-1">{court.category}</Text>
                 </View>
-              </View>
-              <View className="flex-row items-center mt-1">
-                <Text className="text-red-500 font-bold">20%</Text>
-                <Text className="ml-2">Rp 80.000</Text>
-              </View>
-              <Text className="text-gray-500 mt-1">2km from your location</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            className="flex-row items-center bg-white rounded-xl p-3 mb-4 shadow-sm"
-            onPress={() => router.push('/2')}
-          >
-            <Image 
-              source={require('../assets/images/sport-hall-2.png')}
-              className="w-20 h-20 rounded-lg"
-              resizeMode="cover"
-            />
-            <View className="flex-1 ml-3">
-              <View className="flex-row justify-between items-center">
-                <Text className="font-bold text-lg">GOR Garuda</Text>
-                <View className="flex-row items-center">
-                  <Ionicons name="star" size={16} color="#FFD700" />
-                  <Text className="ml-1">4.1</Text>
-                </View>
-              </View>
-              <Text className="mt-1">Rp 120.000</Text>
-              <Text className="text-gray-500 mt-1">5km from your location</Text>
-            </View>
-          </TouchableOpacity>
+              </TouchableOpacity>
+            ))
+          )}
         </View>
       </View>
     </ScrollView>

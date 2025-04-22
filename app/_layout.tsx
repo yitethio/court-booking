@@ -1,7 +1,7 @@
 import { Stack, Tabs } from "expo-router";
 import "../global.css"
 import { Ionicons } from '@expo/vector-icons';
-
+import React from 'react';
 export default function AppLayout() {
   return (
     <Stack>
