@@ -163,7 +163,7 @@ export default function Index() {
 
         {/* Nearby Sport Halls */}
         <View className="px-4 mt-6">
-          <Text className="text-xl font-bold mb-4">Sport halls near you</Text>
+          <Text className="text-xl font-bold mb-4">Sport halls near you Today</Text>
           
           {loading ? (
             <Text>Loading...</Text>
