@@ -18,9 +18,11 @@ interface Court {
 }
 
 export default function Index() {
+  // First, move the searchQuery state to the top with other states
   const [selectedCategory, setSelectedCategory] = useState('');
   const [courts, setCourts] = useState<Court[]>([]);
   const [loading, setLoading] = useState(true);
+// Remove this declaration since it's already declared below
   const router = useRouter();
 
   useEffect(() => {
@@ -40,6 +42,31 @@ export default function Index() {
     }
   };
 
+  // Add this function after fetchCourts
+  // Add this state near the top with other states
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Update the getFilteredCourts function
+  const getFilteredCourts = () => {
+    let filteredCourts = courts;
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      filteredCourts = filteredCourts.filter(court => 
+        court.name.toLowerCase().includes(searchQuery.toLowerCase().trim())
+      );
+    }
+    
+    // Filter by category
+    if (selectedCategory) {
+      filteredCourts = filteredCourts.filter(court => 
+        court.category.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+    
+    return filteredCourts;
+  };
+
   return (
     <ScrollView className="flex-1 bg-white">
       <View>
@@ -56,16 +83,26 @@ export default function Index() {
           <View className="relative">
             <TextInput 
               placeholder="Search courts near you"
-              placeholderTextColor="#6b7280"
+              placeholderTextColor="#9CA3AF"
               returnKeyType="search"
-              className="rounded-lg border border-gray-300 h-11 w-full pl-10 pr-4 text-base bg-white"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              className="rounded-2xl border-0 h-12 w-full pl-12 pr-4 text-base bg-gray-100 shadow-sm"
             />
-            <Ionicons 
-              name="location-outline" 
-              size={20} 
-              color="green" 
-              style={{ position: 'absolute', top: 12, left: 12 }} 
-            />
+            <View className="absolute left-4 top-3.5">
+              <Ionicons 
+                name="search-outline" 
+                size={22} 
+                color="#4B5563"
+              />
+            </View>
+            <TouchableOpacity className="absolute right-4 top-3">
+              <Ionicons 
+                name="options-outline" 
+                size={24} 
+                color="#4B5563"
+              />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -128,6 +165,24 @@ export default function Index() {
             className="px-4 mt-4"
           >
             <TouchableOpacity 
+              onPress={() => setSelectedCategory('')}
+              className={`mr-4 items-center ${!selectedCategory ? 'opacity-100' : 'opacity-70'}`}
+            >
+              <View className={`w-16 h-16 rounded-xl justify-center items-center ${
+                !selectedCategory ? 'bg-green-500' : 'border-2 border-green-500'
+              }`}>
+                <Text 
+                  className={`text-lg font-bold ${
+                    !selectedCategory ? 'text-white' : 'text-green-500'
+                  }`}
+                >
+                  All
+                </Text>
+              </View>
+             
+            </TouchableOpacity>
+
+            <TouchableOpacity 
               onPress={() => setSelectedCategory(selectedCategory === 'basketball' ? '' : 'basketball')}
               className={`mr-4 items-center ${selectedCategory === 'basketball' ? 'opacity-100' : 'opacity-70'}`}
             >
@@ -140,7 +195,7 @@ export default function Index() {
                   color={selectedCategory === 'basketball' ? 'white' : '#22c55e'}
                 />
               </View>
-              <Text className="mt-2 text-sm">Basketball</Text>
+             
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -156,7 +211,7 @@ export default function Index() {
                   color={selectedCategory === 'football' ? 'white' : '#22c55e'}
                 />
               </View>
-              <Text className="mt-2 text-sm">Football</Text>
+              
             </TouchableOpacity>
           </ScrollView>
         </View>
@@ -168,7 +223,7 @@ export default function Index() {
           {loading ? (
             <Text>Loading...</Text>
           ) : (
-            courts.map((court) => (
+            getFilteredCourts().map((court) => (
               <TouchableOpacity 
                 key={court.id}
                 className="flex-row items-center bg-white rounded-xl p-3 mb-4 shadow-sm"
