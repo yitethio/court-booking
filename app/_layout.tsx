@@ -1,20 +1,36 @@
-import { Stack, Tabs } from "expo-router";
+import { Stack } from "expo-router";
 import "../global.css"
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
+
 export default function AppLayout() {
+  const isRegistered = false;
+
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: 'white' },
+      }}
+    >
       <Stack.Screen 
-        name="(tabs)" 
-        options={{ headerShown: false }}
+        name="onboarding"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen 
+        name="(tabs)"
+        options={{
+          headerShown: false,
+          headerTitle: "",
+        }}
       />
       <Stack.Screen 
         name="[id]" 
         options={{ 
+          presentation: 'modal',
           headerShown: false,
-          presentation: 'modal'
-        }}
+        }} 
       />
     </Stack>
   );

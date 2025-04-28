@@ -6,6 +6,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 
 // Add this interface for type safety
+// Update the Court interface first to include promotion
 interface Court {
   name: string;
   facility: string[];
@@ -15,6 +16,7 @@ interface Court {
   category: string;
   ratings: number;
   id: string;
+  promotion: string;
 }
 
 export default function Index() {
@@ -112,49 +114,45 @@ export default function Index() {
           showsHorizontalScrollIndicator={false}
           className="mt-4 px-4"
         >
-          {/* Badminton Promo Card */}
-          <TouchableOpacity className="mr-4">
-            <View className="w-64 h-32 rounded-xl overflow-hidden relative">
-              <Image 
-                source={require('../../assets/images/badminton-court.png')}
-                className="absolute w-full h-full"
-                resizeMode="cover"
-              />
-              <View className="absolute w-full h-full bg-black/30" />
-              <View className="absolute top-2 left-2 bg-red-500 px-2 py-1 rounded-full">
-                <Text className="text-white text-xs">20% Off</Text>
-              </View>
-              <View className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full">
-                <Text className="text-xs">Badminton</Text>
-              </View>
-              <View className="absolute bottom-4 left-4">
-                <Text className="text-lg font-bold text-white">Exclusive Deal</Text>
-                <Text className="text-sm text-white">Book Today and Enjoy a 20% Discount!</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
-          {/* Tennis Promo Card */}
-          <TouchableOpacity className="mr-4">
-            <View className="w-64 h-32 rounded-xl overflow-hidden relative">
-              <Image 
-                source={require('../../assets/images/tennis-court.png')}
-                className="absolute w-full h-full"
-                resizeMode="cover"
-              />
-              <View className="absolute w-full h-full bg-black/30" />
-              <View className="absolute top-2 left-2 bg-blue-500 px-2 py-1 rounded-full">
-                <Text className="text-white text-xs">15% Off</Text>
-              </View>
-              <View className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full">
-                <Text className="text-xs">Tennis</Text>
-              </View>
-              <View className="absolute bottom-4 left-4">
-                <Text className="text-lg font-bold text-white">Weekend Special</Text>
-                <Text className="text-sm text-white">Special rates for weekend bookings!</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
+          {courts
+            .filter(court => court.promotion === "yes")
+            .map((court) => (
+              <TouchableOpacity 
+                key={court.id} 
+                className="mr-4"
+                onPress={() => router.push({
+                  pathname: `/[id]` as const,
+                  params: { 
+                    ...court,
+                    facility: JSON.stringify(court.facility),
+                    rating: court.ratings
+                  }
+                })}
+              >
+                <View className="w-64 h-32 rounded-xl overflow-hidden relative">
+                  <Image 
+                    source={{ uri: court.image }}
+                    className="absolute w-full h-full"
+                    resizeMode="cover"
+                  />
+                  <View className="absolute w-full h-full bg-black/30" />
+                  {court.discount && court.discount !== "0%" && (
+                    <View className="absolute top-2 left-2 bg-red-500 px-2 py-1 rounded-full">
+                      <Text className="text-white text-xs">{court.discount}</Text>
+                    </View>
+                  )}
+                  <View className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full">
+                    <Text className="text-xs">{court.category}</Text>
+                  </View>
+                  <View className="absolute bottom-4 left-4">
+                    <Text className="text-lg font-bold text-white">{court.name}</Text>
+                    {court.discount && court.discount !== "0%" && (
+                      <Text className="text-sm text-white">Book Today and Enjoy {court.discount} Discount!</Text>
+                    )}
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
         </ScrollView>
 
         {/* Category ScrollView */}
@@ -250,10 +248,12 @@ export default function Index() {
                     </View>
                   </View>
                   <View className="flex-row items-center mt-1">
-                    {court.discount && (
+                    {court.discount && court.discount !== "0%" && (
                       <Text className="text-red-500 font-bold">{court.discount}</Text>
                     )}
-                    <Text className="ml-2">{court.price}</Text>
+                    <Text className={`${court.discount && court.discount !== "0%" ? 'ml-2' : ''}`}>
+                      {court.price}
+                    </Text>
                   </View>
                   <Text className="text-gray-500 mt-1">{court.category}</Text>
                 </View>
